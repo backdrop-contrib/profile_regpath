@@ -1,11 +1,11 @@
 NAME
 --------------------------------
-Profile2 Registration Path (profile2_regpath)
+Profile Registration Path (profile_regpath)
 
 
 DESCRIPTION
 --------------------------------
-This module enables administrators to set unique registration paths per Profile2 profile type.
+This module enables administrators to set unique registration paths per Profile profile type.
 
 
 INSTRUCTIONS

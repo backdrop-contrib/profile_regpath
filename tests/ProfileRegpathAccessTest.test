@@ -2,9 +2,9 @@
 
 /**
  * @file
- * Contains Profile2RegpathAccessTest.
+ * Contains ProfileRegpathAccessTest.
  */
-class Profile2RegpathAccessTest extends DrupalWebTestCase {
+class ProfileRegpathAccessTest extends DrupalWebTestCase {
 
   /**
    * Provides the test running information about the test.
@@ -15,7 +15,7 @@ class Profile2RegpathAccessTest extends DrupalWebTestCase {
     return array(
       'name' => 'Access',
       'description' => 'Tests access to the registration pages.',
-      'group' => 'Profile2 Registration Path',
+      'group' => 'Profile Registration Path',
     );
   }
 
@@ -23,8 +23,8 @@ class Profile2RegpathAccessTest extends DrupalWebTestCase {
    * {@inheritdoc}
    */
   public function setUp() {
-    $modules[] = 'profile2';
-    $modules[] = 'profile2_regpath';
+    $modules[] = 'profile';
+    $modules[] = 'profile_regpath';
     parent::setUp($modules);
 
     // Set up a profile.
@@ -32,10 +32,10 @@ class Profile2RegpathAccessTest extends DrupalWebTestCase {
       'type' => 'registration_path',
       'label' => 'Registration Path',
     ));
-    profile2_type_save($profile_type);
+    profile_type_save($profile_type);
 
     // Configure a registration path.
-    $profile_id = profile2_regpath_get_profile_id($profile_type->identifier());
+    $profile_id = profile_regpath_get_profile_id($profile_type->identifier());
     $fields = array(
       'profile_type' => $profile_type->identifier(),
       'path' => 'reg-path',
@@ -52,11 +52,11 @@ class Profile2RegpathAccessTest extends DrupalWebTestCase {
         'confirmation_message' => '',
       )),
     );
-    db_merge('profile2_regpath')->key(array('profile_id' => $profile_id))->fields($fields)->execute();
+    db_merge('profile_regpath')->key(array('profile_id' => $profile_id))->fields($fields)->execute();
   }
 
   /**
-   * Test access to core and profile2_regpath registration pages.
+   * Test access to core and profile_regpath registration pages.
    */
   public function testAccess() {
     // Test the option to allow users to create their own accounts.

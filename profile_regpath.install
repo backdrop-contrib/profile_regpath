@@ -1,0 +1,110 @@
+<?php
+
+/**
+ * @file
+ * Install file for the profile_regpath module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function profile_regpath_schema() {
+  $schema['profile_regpath'] = array(
+    'description' => 'Stores registration path information for profile profiles',
+    'export' => array(
+      'key' => 'profile_type',
+      'key name' => 'Profile Type',
+      'primary key' => 'profile_type',
+      'identifier' => 'regpath',
+      'api' => array(
+        'owner' => 'profile_regpath',
+        'api' => 'profile_regpath',
+        'minimum_version' => '1',
+        'current_version' => '1',
+      ),
+    ),
+    'fields' => array(
+      'profile_type' => array(
+        'description' => 'The {profile_type}.type of this profile.',
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'profile_id' => array(
+        'description' => 'Profile profile ID',
+        'type' => 'int',
+        'not null' => TRUE,
+        'no export' => TRUE,
+      ),
+      'path' => array(
+        'description' => 'Profile-specific registration form path',
+        'type' => 'varchar',
+        'length' => '2048',
+        'not null' => FALSE,
+      ),
+      'roles' => array(
+        'description' => 'Array of role ids',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+      ),
+      'status' => array(
+        'description' => 'Enabled or disabled',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'weight' => array(
+        'description' => 'Weight of profile type',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'misc' => array(
+        'description' => 'Miscellaneous display settings',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('profile_type'),
+    'indexes' => array(
+      'type' => array(array('path', 255)),
+    ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_enable().
+ */
+function profile_regpath_enable() {
+  backdrop_set_message(st('Profile Registration Path has been enabled. To configure profile registration paths, edit a profile type on the ' . l(t('Profile Types administration page'), 'admin/structure/profiles')), 'status');
+}
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function profile_regpath_update_7100() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function profile_regpath_update_7110() { }
+
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function profile_regpath_update_7120() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function profile_regpath_update_7130() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function profile_regpath_update_7131() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function profile_regpath_update_7132() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function profile_regpath_update_7133() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function profile_regpath_update_7134() { }

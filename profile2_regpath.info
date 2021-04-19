@@ -1,6 +1,0 @@
-name = Profile2 Registration Path
-description = Attach profile2 profile forms to profile-specific registration urls.
-core = 7.x
-dependencies[] = ctools
-dependencies[] = profile2
-files[] = tests/Profile2RegpathAccessTest.test

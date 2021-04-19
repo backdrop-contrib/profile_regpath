@@ -8,18 +8,18 @@
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function _profile2_regpath_form_profile2_type_form_alter(&$form, &$form_state, $form_id) {
-  if (user_access('administer profile2_regpath')) {
+function _profile_regpath_form_profile_type_form_alter(&$form, &$form_state, $form_id) {
+  if (user_access('administer profile_regpath')) {
     // Grab existing values.
     global $base_url;
     $profile_type = $form['type']['#default_value'];
-    $settings     = profile2_regpath_regpath_load($profile_type);
+    $settings     = profile_regpath_regpath_load($profile_type);
     // Unserialize array of miscellaneous display options.
     if (is_object($settings)) {
       $misc = unserialize($settings->misc);
     }
 
-    // Change description of Profile2's registration checkbox.
+    // Change description of Profile's registration checkbox.
     $form['data']['registration']['#title'] = t('Show on all user account registration forms.');
     $form['data']['registration']['#description'] = t('If selected, fields for this profile type will be added to the core user registration page and the administrative add user page.');
 
@@ -48,7 +48,7 @@ function _profile2_regpath_form_profile2_type_form_alter(&$form, &$form_state, $
     $form['regpath']['settings']['path'] = array(
       '#type' => 'textfield',
       '#title' => t('URL path'),
-      '#field_prefix' => variable_get('clean_url') ? $base_url . '/' : $base_url . '?q=',
+      '#field_prefix' => config_get('system.performance', 'clean_url') ? $base_url . '/' : $base_url . '?q=',
       '#field_suffix' => '/register',
       '#default_value' => is_object($settings) && $settings->path ? $settings->path : '',
       '#description' => t('Please enter the base URL for this registration path.
@@ -124,11 +124,11 @@ function _profile2_regpath_form_profile2_type_form_alter(&$form, &$form_state, $
 
     // Add form fields for assigning roles during registration.
     $roles = user_roles(TRUE);
-    unset($roles[DRUPAL_AUTHENTICATED_RID]);
+    unset($roles[BACKDROP_AUTHENTICATED_ROLE]);
 
     // Prepare default value for roles checkbox.
     $default_roles = array();
-    $roles_settings = is_object($settings) && $settings->roles ? unserialize($settings->roles) : array();
+    $roles_settings = is_object($settings) && $settings->roles?unserialize($settings->roles) : array();
     $enabled_rids = array_keys($roles_settings);
     foreach ($roles as $rid => $role_name) {
       if (in_array($rid, $enabled_rids)) {
@@ -151,39 +151,39 @@ function _profile2_regpath_form_profile2_type_form_alter(&$form, &$form_state, $
       '#type' => 'select',
       '#title' => t('Weight'),
       '#description' => t("If multiple sets of profile fields are attached to a single registration path, they will be sorted in ascending order by weight. This will affect both the order of profile fields and the title settings."),
-      '#options' => drupal_map_assoc(range(-10, 10, 1)),
+      '#options' => backdrop_map_assoc(range(-10, 10, 1)),
       '#default_value' => is_object($settings) && $settings->weight ? (int) $settings->weight : 0,
     );
 
     // Add new validate and submit handlers.
-    $form['#validate'][] = 'profile2_regpath_validate_settings';
-    $form['#submit'][] = 'profile2_regpath_save_settings';
+    $form['#validate'][] = 'profile_regpath_validate_settings';
+    $form['#submit'][] = 'profile_regpath_save_settings';
   }
 }
 
 /**
  * Validate profile settings form values.
  */
-function profile2_regpath_validate_settings($form, &$form_state) {
+function profile_regpath_validate_settings($form, &$form_state) {
   if ($form_state['values']['status'] == 1) {
     // Validate URL tail via regex. This also tests that path is not null.
-    if (profile2_regpath_url_validator(trim($form_state['values']['path'])) == FALSE) {
+    if (profile_regpath_url_validator(trim($form_state['values']['path'])) == FALSE) {
       form_set_error('path', 'Error, you did not enter a valid URL.');
     }
     // Ensure that URL does not contain a '/'.
-    // @todo move this to profile2_regpath_url_validator.
+    // @todo move this to profile_regpath_url_validator.
     if (strpos($form_state['values']['path'], '/')) {
       form_set_error('path', 'Error, you cannot use a "/" in your unique path. You may specify only a single segment of the URL.');
     }
     // Check to see if another module is using the selected path.
     // We must make exceptions for '/user' and other p2rp registered paths.
     if ($form_state['values']['path'] != 'user' && $existing_item = menu_get_item($form_state['values']['path'])) {
-      if ($existing_item['page_callback'] != '_profile2_regpath_user_login') {
+      if ($existing_item['page_callback'] != '_profile_regpath_user_login') {
         form_set_error('path', 'Error, that base path is already being used by another module.');
       }
     }
     // Check to see if selected path is being used by an alias.
-    if ($existing_alias = drupal_lookup_path('source', $form_state['values']['path'])) {
+    if ($existing_alias = backdrop_lookup_path('source', $form_state['values']['path'])) {
       form_set_error('path', t('Error, that base path is already being used as an alias. Please select a different base path or remove the alias.'));
     }
   }
@@ -198,42 +198,42 @@ function profile2_regpath_validate_settings($form, &$form_state) {
  * @return boolean
  *   TRUE if the URL is in a valid format, and FALSE if it isn't.
  */
-function profile2_regpath_url_validator($url) {
+function profile_regpath_url_validator($url) {
   $LINK_ICHARS_DOMAIN = (string) html_entity_decode(implode("", array(
-        // æ
-        "&#x00E6;",
-        // Æ
-        "&#x00C6;",
-        // ø
-        "&#x00F8;",
-        // Ø
-        "&#x00D8;",
-        // å
-        "&#x00E5;",
-        // Å
-        "&#x00C5;",
-        // ä
-        "&#x00E4;",
-        // Ä
-        "&#x00C4;",
-        // ö
-        "&#x00F6;",
-        // Ö
-        "&#x00D6;",
-        // ü
-        "&#x00FC;",
-        // Ü
-        "&#x00DC;",
-        // Ñ
-        "&#x00D1;",
-        // ñ
-        "&#x00F1;",
-      )), ENT_QUOTES, 'UTF-8');
+    // æ
+    "&#x00E6;",
+    // Æ
+    "&#x00C6;",
+    // ø
+    "&#x00F8;",
+    // Ø
+    "&#x00D8;",
+    // å
+    "&#x00E5;",
+    // Å
+    "&#x00C5;",
+    // ä
+    "&#x00E4;",
+    // Ä
+    "&#x00C4;",
+    // ö
+    "&#x00F6;",
+    // Ö
+    "&#x00D6;",
+    // ü
+    "&#x00FC;",
+    // Ü
+    "&#x00DC;",
+    // Ñ
+    "&#x00D1;",
+    // ñ
+    "&#x00F1;",
+  )), ENT_QUOTES, 'UTF-8');
 
   $LINK_ICHARS = $LINK_ICHARS_DOMAIN . (string) html_entity_decode(implode("", array(
-        // ß
-        "&#x00DF;",
-      )), ENT_QUOTES, 'UTF-8');
+    // ß
+    "&#x00DF;",
+  )), ENT_QUOTES, 'UTF-8');
 
   // Pattern specific to internal links.
   $internal_pattern = "/^(?:[a-z0-9" . $LINK_ICHARS . "_\-+\[\]]+)";
@@ -254,9 +254,9 @@ function profile2_regpath_url_validator($url) {
 /**
  * Helper function to save profile settings.
  */
-function profile2_regpath_save_settings($form, &$form_state) {
+function profile_regpath_save_settings($form, &$form_state) {
   $profile_type = $form_state['values']['type'];
-  $profile_id = profile2_regpath_get_profile_id($profile_type);
+  $profile_id = profile_regpath_get_profile_id($profile_type);
 
   // Define fields for db_merge.
   $fields = array(
@@ -269,29 +269,29 @@ function profile2_regpath_save_settings($form, &$form_state) {
   $roles = array();
   foreach ($form_state['values']['roles'] as $role_id => $enable) {
     if ($enable) {
-      $roles[$role_id] = db_query("SELECT r.name FROM {role} AS r WHERE r.rid = :rid", array(':rid' => $role_id))->fetchField();
+      $roles[$role_id] = $role_id; // db_query("SELECT r.name FROM {role} AS r WHERE r.rid = :rid", array(':rid' => $role_id))->fetchField();
     }
   }
   $fields['roles'] = serialize($roles);
 
   // Create array of miscellaneous display options.
   $fields['misc'] = serialize(array(
-      'fieldset_wrap' => $form_state['values']['fieldset_wrap'],
-      'custom_titles' => $form_state['values']['custom_titles'],
-      'login_title' => $form_state['values']['login_title'],
-      'register_title' => $form_state['values']['register_title'],
-      'password_title' => $form_state['values']['password_title'],
-      'confirmation_display' => $form_state['values']['confirmation_display'],
-      'confirmation_message' => $form_state['values']['confirmation_message'],
-    ));
+    'fieldset_wrap' => $form_state['values']['fieldset_wrap'],
+    'custom_titles' => $form_state['values']['custom_titles'],
+    'login_title' => $form_state['values']['login_title'],
+    'register_title' => $form_state['values']['register_title'],
+    'password_title' => $form_state['values']['password_title'],
+    'confirmation_display' => $form_state['values']['confirmation_display'],
+    'confirmation_message' => $form_state['values']['confirmation_message'],
+  ));
 
   // Add settings to database.
   $fields['profile_type'] = $profile_type;
   $fields['profile_id'] = $profile_id;
-  profile2_regpath_regpath_save($fields);
+  profile_regpath_regpath_save($fields);
 
   // Rebuild menu.
   if (menu_rebuild()) {
-    drupal_set_message(t('The menu system has been rebuilt.'));
+    backdrop_set_message(t('The menu system has been rebuilt.'));
   }
 }
