@@ -128,7 +128,7 @@ function profile_regpath_form_profile_type_form_alter(&$form, &$form_state, $for
  */
 function profile_regpath_profile_type_delete($type) {
   // Delete table entries for deleted profile profile type.
-  db_delete('profile_regpath')->condition('profile_id', $type->id)->execute();
+  db_delete('profile_regpath')->condition('profile_id', $type->type)->execute();
 }
 
 /**
@@ -166,7 +166,7 @@ function profile_regpath_form_alter(&$form, &$form_state, $form_id) {
 /**
  * Implements hook_user_insert().
  */
-function profile_regpath_user_insert(&$edit, $account, $category) {
+function profile_regpath_user_insert($account) {
   // Show custom confirmation message.
   if (isset($_SESSION['profile_regpath']['confirmation_message'])) {
     backdrop_set_message(filter_xss($_SESSION['profile_regpath']['confirmation_message']));
@@ -186,7 +186,7 @@ function profile_regpath_user_insert(&$edit, $account, $category) {
 function profile_regpath_get_profile_id($profile_type) {
   $data = config_get('profile.type.' . $profile_type);
   // $profile_id = db_query("SELECT id FROM {profile_type} WHERE type = :profile_type", array(':profile_type' => $profile_type))->fetchField();
-  return $data['id'];
+  return $data['type'];
 }
 
 /**
@@ -276,7 +276,7 @@ function profile_regpath_regpath_save(&$regpath) {
   // Check if we have profile id when creating new regpath
   if (!$update) {
     // We are creating new profile type
-    if (!isset($regpath['profile_id']) || !is_numeric($regpath['profile_id']) || $regpath['profile_id'] <= 0) {
+    if (!isset($regpath['profile_id'])) {
       // Unvalid profile id
       // New profile type need profile id, we load it from database
       $profile_type = profile_type_load($regpath['profile_type']);
@@ -286,7 +286,7 @@ function profile_regpath_regpath_save(&$regpath) {
         return FALSE;
       }
       else {
-        $regpath['profile_id'] = $profile_type->id;
+        $regpath['profile_id'] = $profile_type->type;
       }
     }
   }
@@ -336,14 +336,6 @@ function profile_regpath_features_rebuild($module_name) {
     }
   }
   menu_rebuild();
-}
-
-/**
- * Implements hook_autoload_info().
- */
-function profile_regpath_autoload_info() {
-  return array(
-  );
 }
 
 function profile_regpath_load_object($table, $type = 'all', $args = array()) {

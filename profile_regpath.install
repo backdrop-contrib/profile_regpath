@@ -33,9 +33,9 @@ function profile_regpath_schema() {
       ),
       'profile_id' => array(
         'description' => 'Profile profile ID',
-        'type' => 'int',
+        'type' => 'varchar',
+        'length' => '255',
         'not null' => TRUE,
-        'no export' => TRUE,
       ),
       'path' => array(
         'description' => 'Profile-specific registration form path',
