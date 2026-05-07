@@ -1,23 +1,13 @@
 <?php
-
 /**
  * @file
  * Contains ProfileRegpathAccessTest.
  */
-class ProfileRegpathAccessTest extends DrupalWebTestCase {
 
-  /**
-   * Provides the test running information about the test.
-   *
-   * @return array
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Access',
-      'description' => 'Tests access to the registration pages.',
-      'group' => 'Profile Registration Path',
-    );
-  }
+/**
+ * Basic tests.
+ */
+class ProfileRegpathAccessTest extends BackdropWebTestCase {
 
   /**
    * {@inheritdoc}
@@ -28,16 +18,17 @@ class ProfileRegpathAccessTest extends DrupalWebTestCase {
     parent::setUp($modules);
 
     // Set up a profile.
-    $profile_type = new ProfileType(array(
+    $profile_type = new Profile(array(
       'type' => 'registration_path',
       'label' => 'Registration Path',
+      'storage' => PROFILE_STORAGE_DEFAULT,
     ));
     profile_type_save($profile_type);
 
     // Configure a registration path.
-    $profile_id = profile_regpath_get_profile_id($profile_type->identifier());
+    $profile_id = profile_regpath_get_profile_id($profile_type->type);
     $fields = array(
-      'profile_type' => $profile_type->identifier(),
+      'profile_type' => $profile_type->type,
       'path' => 'reg-path',
       'status' => 1,
       'weight' => 0,
@@ -53,6 +44,7 @@ class ProfileRegpathAccessTest extends DrupalWebTestCase {
       )),
     );
     db_merge('profile_regpath')->key(array('profile_id' => $profile_id))->fields($fields)->execute();
+    return TRUE;
   }
 
   /**
@@ -60,63 +52,63 @@ class ProfileRegpathAccessTest extends DrupalWebTestCase {
    */
   public function testAccess() {
     // Test the option to allow users to create their own accounts.
-    variable_set('user_register', USER_REGISTER_VISITORS);
+    config_set('system.core', 'user_register', USER_REGISTER_VISITORS);
     $this->resetAll();
-    $this->drupalGet('user');
+    $this->backdropGet('user');
     $this->assertResponse(200);
-    $this->drupalGet('user/login');
+    $this->backdropGet('user/login');
     $this->assertResponse(200);
-    $this->drupalGet('user/password');
+    $this->backdropGet('user/password');
     $this->assertResponse(200);
-    $this->drupalGet('user/register');
+    $this->backdropGet('user/register');
     $this->assertResponse(200);
-    $this->drupalGet('reg-path');
+    $this->backdropGet('reg-path');
     $this->assertResponse(200);
-    $this->drupalGet('reg-path/login');
+    $this->backdropGet('reg-path/login');
     $this->assertResponse(200);
-    $this->drupalGet('reg-path/password');
+    $this->backdropGet('reg-path/password');
     $this->assertResponse(200);
-    $this->drupalGet('reg-path/register');
+    $this->backdropGet('reg-path/register');
     $this->assertResponse(200);
 
     // Test the option where admin approval is required for account creation.
-    variable_set('user_register', USER_REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL);
+    config_set('system.core', 'user_register', USER_REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL);
     $this->resetAll();
-    $this->drupalGet('user');
+    $this->backdropGet('user');
     $this->assertResponse(200);
-    $this->drupalGet('user/login');
+    $this->backdropGet('user/login');
     $this->assertResponse(200);
-    $this->drupalGet('user/password');
+    $this->backdropGet('user/password');
     $this->assertResponse(200);
-    $this->drupalGet('user/register');
+    $this->backdropGet('user/register');
     $this->assertResponse(200);
-    $this->drupalGet('reg-path');
+    $this->backdropGet('reg-path');
     $this->assertResponse(200);
-    $this->drupalGet('reg-path/login');
+    $this->backdropGet('reg-path/login');
     $this->assertResponse(200);
-    $this->drupalGet('reg-path/password');
+    $this->backdropGet('reg-path/password');
     $this->assertResponse(200);
-    $this->drupalGet('reg-path/register');
+    $this->backdropGet('reg-path/register');
     $this->assertResponse(200);
 
     // Test the option where only admins may create accounts.
-    variable_set('user_register', USER_REGISTER_ADMINISTRATORS_ONLY);
+    config_set('system.core', 'user_register', USER_REGISTER_ADMINISTRATORS_ONLY);
     $this->resetAll();
-    $this->drupalGet('user');
+    $this->backdropGet('user');
     $this->assertResponse(200);
-    $this->drupalGet('user/login');
+    $this->backdropGet('user/login');
     $this->assertResponse(200);
-    $this->drupalGet('user/password');
+    $this->backdropGet('user/password');
     $this->assertResponse(200);
-    $this->drupalGet('user/register');
+    $this->backdropGet('user/register');
     $this->assertResponse(403);
-    $this->drupalGet('reg-path');
+    $this->backdropGet('reg-path');
     $this->assertResponse(200);
-    $this->drupalGet('reg-path/login');
+    $this->backdropGet('reg-path/login');
     $this->assertResponse(200);
-    $this->drupalGet('reg-path/password');
+    $this->backdropGet('reg-path/password');
     $this->assertResponse(200);
-    $this->drupalGet('reg-path/register');
+    $this->backdropGet('reg-path/register');
     $this->assertResponse(403);
   }
 

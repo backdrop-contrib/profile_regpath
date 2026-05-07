@@ -2,5 +2,5 @@
 name = Access
 description = Tests access to the registration pages.
 group = Profile Registration Path
-file = tests/ProfileRegpathAccessTest.test
+file = ProfileRegpathAccessTest.test
 

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Install file for the profile_regpath module.
@@ -84,27 +83,9 @@ function profile_regpath_enable() {
   backdrop_set_message(st('Profile Registration Path has been enabled. To configure profile registration paths, edit a profile type on the ' . l(t('Profile Types administration page'), 'admin/structure/profiles')), 'status');
 }
 
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function profile_regpath_update_7100() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function profile_regpath_update_7110() { }
-
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function profile_regpath_update_7120() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function profile_regpath_update_7130() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function profile_regpath_update_7131() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function profile_regpath_update_7132() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function profile_regpath_update_7133() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function profile_regpath_update_7134() { }
+/**
+ * Implements update_last_removed().
+ */
+function profile_regpath_update_last_removed() {
+  return 7134;
+}
