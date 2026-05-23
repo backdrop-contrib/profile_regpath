@@ -27,6 +27,7 @@ Maintainers
 ---------------    
 
 - docwilmot (https://github.com/docwilmot/)
+- indigoxela (https://github.com/indigoxela/)
 
 Seeking additional maintainers
 
