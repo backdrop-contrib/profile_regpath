@@ -7,3 +7,5 @@ jobs:
     steps:
       - name: Run Tests
         uses: indigoxela/gha_composite/actions/simpletest@v1
+        with:
+          module_dependencies: "profile"
