@@ -41,11 +41,10 @@ function profile_regpath_attach_profile_fields(&$form, &$form_state, $form_id, $
         $form_state['profiles'][$type_name] = $profile;
 
         $misc = unserialize($profile_types[$key]->misc);
-        if ($misc['fieldset_wrap']) {
-          // Wrap each profile form in a fieldset.
+        if (!$misc['fieldset_wrap']) {
+          // Unwrap from fieldset (default in Profile module).
           $form['profile_' . $type_name] = array(
-            '#type' => 'fieldset',
-            '#title' => check_plain(profile_regpath_get_profile_label($profile_types[$key]->profile_type)),
+            '#type' => 'container',
           );
         }
         // Set Form API #weight attribute for profile.
