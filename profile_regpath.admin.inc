@@ -20,8 +20,8 @@ function _profile_regpath_form_profile_type_form_alter(&$form, &$form_state, $fo
     }
 
     // Change description of Profile's registration checkbox.
-    $form['data']['registration']['#title'] = t('Show on all user account registration forms.');
-    $form['data']['registration']['#description'] = t('If selected, fields for this profile type will be added to the core user registration page and the administrative add user page.');
+    $form['registration']['#title'] = t('Show on all user account registration forms.');
+    $form['registration']['#description'] = t('If selected, fields for this profile type will be added to the core user registration page and the administrative add user page.');
 
     // Create new form fields.
     $form['regpath'] = array(
