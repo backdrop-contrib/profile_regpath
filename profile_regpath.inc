@@ -59,16 +59,10 @@ function profile_regpath_attach_profile_fields(&$form, &$form_state, $form_id, $
 
       // Add appropriate user roles.
       $profile_roles = unserialize($value->roles);
-      foreach ($profile_roles as $rid => $role_name) {
-        // Add role to roles array if it isn't already there.
-        if (!empty($role_name) && !array_key_exists($rid, $form['account_settings']['roles']) && isset($user_roles[$rid])) {
-          $form['account_settings']['roles'][$rid] = array(
-            '#type' => 'checkbox',
-            '#title' => check_plain($user_roles[$rid]),
-            '#default_value' => TRUE,
-            '#disabled' => !user_access('administer users'),
-          );
-        }
+      if (!empty($profile_roles)) {
+        // Make sure roles still exist.
+        $assign_roles = array_intersect_key($profile_roles, $form['account_settings']['roles']['#options']);
+        $form['account_settings']['roles']['#default_value'] = $assign_roles;
       }
 
     }

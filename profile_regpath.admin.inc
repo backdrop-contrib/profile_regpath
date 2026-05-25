@@ -125,6 +125,11 @@ function _profile_regpath_form_profile_type_form_alter(&$form, &$form_state, $fo
     // Add form fields for assigning roles during registration.
     $roles = user_roles(TRUE);
     unset($roles[BACKDROP_AUTHENTICATED_ROLE]);
+    // For sure not admin.
+    $admin_role = config_get('system.core', 'user_admin_role');
+    if (!empty($admin_role)) {
+      unset($roles[$admin_role]);
+    }
 
     // Prepare default value for roles checkbox.
     $default_roles = array();
@@ -139,7 +144,7 @@ function _profile_regpath_form_profile_type_form_alter(&$form, &$form_state, $fo
       }
     }
 
-    $form['regpath']['settings']['roles'] = array(
+    $form['regpath']['settings']['roles_assign'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Assign roles during registration'),
       '#description' => t('Please select any roles that you would like to automatically assign to users registering via this registration path.'),
@@ -267,7 +272,7 @@ function profile_regpath_save_settings($form, &$form_state) {
 
   // Add roles if enabled.
   $roles = array();
-  foreach ($form_state['values']['roles'] as $role_id => $enable) {
+  foreach ($form_state['values']['roles_assign'] as $role_id => $enable) {
     if ($enable) {
       $roles[$role_id] = $role_id; // db_query("SELECT r.name FROM {role} AS r WHERE r.rid = :rid", array(':rid' => $role_id))->fetchField();
     }
