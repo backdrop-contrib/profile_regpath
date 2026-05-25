@@ -89,3 +89,16 @@ function profile_regpath_enable() {
 function profile_regpath_update_last_removed() {
   return 7134;
 }
+
+/**
+ * Empty misleading column data to prevent faulty role assignment.
+ */
+function profile_regpath_update_1000() {
+  // Previously role assignment on registration didn't work, but this column
+  // potentially contains *all roles* because of a form key collision.
+  // Reset to empty array as now assignment will work.
+  $empty = serialize(array());
+  db_update('profile_regpath')
+    ->fields(array('roles' => $empty))
+    ->execute();
+}
