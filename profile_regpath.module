@@ -152,9 +152,15 @@ function profile_regpath_form_alter(&$form, &$form_state, $form_id) {
         $path = $source;
       }
 
-      // Grab first part of URL.
       $path_parts = explode('/', $path);
-      $path_key = reset($path_parts);
+      if (count($path_parts) == 4 && $path_parts[2] == 'prp-create') {
+        // Admin form - last path part.
+        $path_key = end($path_parts);
+      }
+      else {
+        // Register form for anonymous - first path part.
+        $path_key = reset($path_parts);
+      }
 
       // Load profiles for this path key and attach associated fields.
       $profile_types = profile_regpath_regpath_load_multiple(array('path' => $path_key, 'status' => 1));
