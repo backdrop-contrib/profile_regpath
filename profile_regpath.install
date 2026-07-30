@@ -97,8 +97,43 @@ function profile_regpath_update_1000() {
   // Previously role assignment on registration didn't work, but this column
   // potentially contains *all roles* because of a form key collision.
   // Reset to empty array as now assignment will work.
+  $table_name = 'profile_regpath';
+  if (db_table_exists('profile2_regpath')) {
+    $table_name = 'profile2_regpath';
+  }
   $empty = serialize(array());
-  db_update('profile_regpath')
+  db_update($table_name)
     ->fields(array('roles' => $empty))
+    ->execute();
+}
+
+/**
+ * Rename database table from Drupal 7.
+ */
+function profile_regpath_update_1001() {
+  // We need to make sure that D7 made it at least to
+  // profile2_regpath_update_7133(), so "profile_type" is available.
+  // Those update hooks never made it into stable releases, so this requires to
+  // run the update hooks in D7 on the latest Drupal dev.
+  if (db_table_exists('profile2_regpath')) {
+    if (db_field_exists('profile2_regpath', 'profile_type')) {
+      // Just in case.
+      if (db_table_exists('profile_regpath')) {
+        db_drop_table('profile_regpath');
+      }
+      db_rename_table('profile2_regpath', 'profile_regpath');
+    }
+    else {
+      return 'Database table "profile2_regpath" exists, but an essential column is missing. Migration not possible.';
+    }
+  }
+}
+
+/**
+ * Clean up old Drupal 7 record in system table.
+ */
+function profile_regpath_update_1002() {
+  db_delete('system')
+    ->condition('name', 'profile2_regpath')
     ->execute();
 }
