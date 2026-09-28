@@ -296,7 +296,5 @@ function profile_regpath_save_settings($form, &$form_state) {
   profile_regpath_regpath_save($fields);
 
   // Rebuild menu.
-  if (menu_rebuild()) {
-    backdrop_set_message(t('The menu system has been rebuilt.'));
-  }
+  state_set('menu_rebuild_needed', TRUE);
 }
